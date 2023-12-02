@@ -87,7 +87,7 @@ func calculate(numbers []int) int {
 }
 
 func main() {
-	data, err := os.ReadFile("input.txt")
+	data, err := os.ReadFile("../input.txt")
 
 	check(err)
 
