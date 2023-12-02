@@ -1,16 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"sort"
+	"strconv"
 	"strings"
 )
-
-type Slice struct {
-	int
-	string
-}
 
 func check(e error) {
 	if e != nil {
@@ -32,17 +28,6 @@ var Numbers []int
 // }
 
 var Values = map[string]int{
-	"1":     1,
-	"2":     2,
-	"3":     3,
-	"4":     4,
-	"5":     5,
-	"6":     6,
-	"7":     7,
-	"8":     8,
-	"9":     9,
-	"0":     0,
-	"zero":  0,
 	"one":   1,
 	"two":   2,
 	"three": 3,
@@ -52,68 +37,56 @@ var Values = map[string]int{
 	"seven": 7,
 	"eight": 8,
 	"nine":  9,
+	"1":     1,
+	"2":     2,
+	"3":     3,
+	"4":     4,
+	"5":     5,
+	"6":     6,
+	"7":     7,
+	"8":     8,
+	"9":     9,
 }
 
-func scanString(input string, valuesToCheck []string) []int {
-	var result []int
+var ErrNoMatch = errors.New("no match found")
 
-	// Scan through each index of the sentence
-
+func scanFromBeginning(input string) (int, error) {
 	for i := 0; i < len(input); i++ {
-		for _, pattern := range valuesToCheck {
-			if strings.Contains(input[i:], pattern) {
-
-				// resolve the value and update the index
-				result = append(result, Values[pattern])
-				i += len(pattern) - 1
-
-				// exit the loop as soon as the result is found and start from the last index + 1
-				break
+		for key, value := range Values {
+			if strings.HasPrefix(input[i:], key) {
+				return value, nil
 			}
 		}
 	}
-	return result
+	return 0, ErrNoMatch
 }
 
-func orderResult(result []int, input string) []int {
-	// make a map to store the index of each character in the original string
-	indexes := make(map[rune]int)
-	// not sure if this works but let's try
-	for i, char := range input {
-		indexes[char] = i
+func scanFromEnd(input string) (int, error) {
+	for i := len(input) - 1; i >= 0; i-- {
+		for key, value := range Values {
+			if strings.HasPrefix(input[i:], key) {
+				return value, nil
+			}
+		}
 	}
-
-	// sort the result based on original indexes
-	sort.Slice(result, func(i, j int) bool {
-		return indexes[rune(result[i])] < indexes[rune(result[j])]
-	})
-	return result
+	return 0, ErrNoMatch
 }
 
-func scanSentenceBasedOnPattern(input string) []int {
-	var result []int
-
-	// So the loop will scan the sentence four times, each time scan through different length of the pattern to make sure we don't miss anything
-	patterns := [][]string{
-		{"three", "seven", "eight"},
-		{"four", "five", "zero", "nine"},
-		{"one", "two", "six"},
-		{"1", "2", "3", "4", "5", "6", "7", "8", "9"},
+func scanSentenceReturnNumber(input string) int {
+	firstDigit, err := scanFromBeginning(input)
+	if err != nil {
+		fmt.Println("There is an error at the first digit", err)
+	}
+	lastDigit, err := scanFromEnd(input)
+	if err != nil {
+		fmt.Println("There is an error at the last digit", err)
 	}
 
-	for _, pattern := range patterns {
-
-		// Scan the string with the current patterns
-		result = append(result, scanString(input, pattern)...)
-
-		// Order the result based on the the original string
-		result = orderResult(result, input)
+	result, err := strconv.Atoi(fmt.Sprintf("%d%d", firstDigit, lastDigit))
+	if err != nil {
+		fmt.Println("Error converting result to integer", err)
 	}
-	// reorder them again to make sure
-	result = orderResult(result, input)
-
 	fmt.Println("result", result)
-
 	return result
 }
 
@@ -126,6 +99,6 @@ func main() {
 	lines := strings.Split(myString, "\n")
 
 	for _, line := range lines {
-		scanSentenceBasedOnPattern(line)
+		scanSentenceReturnNumber(line)
 	}
 }
