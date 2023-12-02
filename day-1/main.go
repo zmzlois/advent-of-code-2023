@@ -64,7 +64,7 @@ func scanFromBeginning(input string) (int, error) {
 func scanFromEnd(input string) (int, error) {
 	for i := len(input) - 1; i >= 0; i-- {
 		for key, value := range Values {
-			if strings.HasPrefix(input[i:], key) {
+			if strings.Contains(input[i:], key) {
 				return value, nil
 			}
 		}
@@ -86,8 +86,15 @@ func scanSentenceReturnNumber(input string) int {
 	if err != nil {
 		fmt.Println("Error converting result to integer", err)
 	}
-	fmt.Println("result", result)
 	return result
+}
+
+func calculate(numbers []int) int {
+	sum := 0
+	for _, num := range numbers {
+		sum += num
+	}
+	return sum
 }
 
 func main() {
@@ -95,10 +102,16 @@ func main() {
 
 	check(err)
 
+	var allNumbers []int
+
 	myString := string(data[:])
 	lines := strings.Split(myString, "\n")
 
-	for _, line := range lines {
-		scanSentenceReturnNumber(line)
+	for index, line := range lines {
+		number := scanSentenceReturnNumber(line)
+		fmt.Printf("Index: %d, number: %d\n", index+1, number)
+		allNumbers = append(allNumbers, number)
 	}
+	result := calculate(allNumbers)
+	fmt.Println("result", result)
 }
