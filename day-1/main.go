@@ -16,17 +16,6 @@ func check(e error) {
 
 var Numbers []int
 
-//
-// func isInteger(value interface{}) bool {
-// 	valType := reflect.TypeOf(value)
-//
-// 	return valType.Kind() == reflect.Int ||
-// 		valType.Kind() == reflect.Int8 ||
-// 		valType.Kind() == reflect.Int16 ||
-// 		valType.Kind() == reflect.Int32 ||
-// 		valType.Kind() == reflect.Int64
-// }
-
 var Values = map[string]int{
 	"one":   1,
 	"two":   2,
