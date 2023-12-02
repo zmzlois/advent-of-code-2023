@@ -14,15 +14,29 @@ var Requirement = map[string]int{
 	"blue":  14,
 }
 
-func formatAndCalculateSet(set string) int {
+func formatAndCheckingValidSet(set string) int {
 
 	// At this point the cube will be 1 red, 1 blue, 4 green
 	cubes := strings.Split(set, ",")
-	cubMap := make(map[string]int, len(cubes))
+	cubeMap := make(map[string]int, len(cubes))
 	for index, cubeColor := range cubes {
 		// At this point the cube will be one of 1 red, 1 blue, 4 green
 		color := strings.Split(cubeColor, " ")[1]
-		numberOfCube := strconv.Atoi(strings.Split(cubeColor, " ")[0])
+		numberOfCube, err := strconv.Atoi(strings.Split(cubeColor, " ")[0])
+		if err != nil {
+			fmt.Println("Failed to format numberOfCube")
+		}
+
+		// update each cubeMap's color and number value
+		if _, ok := cubeMap[color]; ok {
+			cubeMap[color] = numberOfCube
+		} else {
+			originalNumber := cubeMap[color]
+			updatedNumber := originalNumber + numberOfCube
+			// plus them together and then update the map
+			cubeMap[color] = updatedNumber
+		}
+
 	}
 
 	// just put return 0 for now
