@@ -23,18 +23,19 @@ func powerAll(numbers []int) int {
 	return init
 }
 
-func findLargestReturnPower(gameSets string) []int {
+func findLargestReturnPower(gameSets string) int {
 
 	// This will include all the gameSets here
 	gameSet := strings.Split(gameSets, ";")
+	var ColorMap = map[string]int{
+		"red":   1,
+		"blue":  1,
+		"green": 1,
+	}
 	// gameSet will look like 3 blue, 4 red, 7 green
 	// we further down split them by comma
 	for _, sets := range gameSet {
-		var ColorMap = map[string]int{
-			"red":   0,
-			"blue":  0,
-			"green": 0,
-		}
+
 		setsWithSpaces := strings.Split(sets, ",")
 		// there might be whitespace too so need to trim it
 		for _, setsWithSpace := range setsWithSpaces {
@@ -61,10 +62,18 @@ func findLargestReturnPower(gameSets string) []int {
 			// In every other cases, replace it
 			ColorMap[color] = numberOfColor
 		}
+
 	}
-	number := []int{2}
-	return number
+	// after we get an update of every color in the color map
+	// loop them and multiply them
+
+	var initialNumber = 1
+	for _, colorNumber := range ColorMap {
+		initialNumber = colorNumber * initialNumber
+	}
+	return initialNumber
 }
+
 func main() {
 	file, fileErr := os.ReadFile("../../input.txt")
 	if fileErr != nil {
@@ -74,7 +83,7 @@ func main() {
 	fmt.Println(stringFile)
 	lines := strings.Split(stringFile, "\n")
 
-	// var total []int
+	var total []int
 	for _, line := range lines {
 		game := strings.Split(line, ":")
 
@@ -87,6 +96,11 @@ func main() {
 
 		fmt.Println("gamesets:", gameSets)
 		number := findLargestReturnPower(gameSets)
-		fmt.Println("number:", number)
+
+		// for every line we append this number to the total array
+		total = append(total, number)
 	}
+	// once we get the total number we calculate all the number here
+	result := sumAll(total)
+	fmt.Println("result is:", result)
 }
