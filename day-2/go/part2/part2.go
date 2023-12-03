@@ -23,19 +23,18 @@ func powerAll(numbers []int) int {
 	return init
 }
 
-var ColorMap = map[string]int{
-	"red":   0,
-	"blue":  0,
-	"green": 0,
-}
+func findLargestReturnPower(gameSets string) []int {
 
-func findLargest(gameSets string) []int {
 	// This will include all the gameSets here
 	gameSet := strings.Split(gameSets, ";")
 	// gameSet will look like 3 blue, 4 red, 7 green
 	// we further down split them by comma
 	for _, sets := range gameSet {
-
+		var ColorMap = map[string]int{
+			"red":   0,
+			"blue":  0,
+			"green": 0,
+		}
 		setsWithSpaces := strings.Split(sets, ",")
 		// there might be whitespace too so need to trim it
 		for _, setsWithSpace := range setsWithSpaces {
@@ -49,11 +48,22 @@ func findLargest(gameSets string) []int {
 				continue
 			}
 			color := set[1]
-			numberOfColor := set[0]
-
+			numberOfColor, numbErr := strconv.Atoi(set[0])
+			if numbErr != nil {
+				fmt.Println("error processing the number of cube", numbErr)
+			}
+			// in each of these sets. update the ColorMap
+			// if it is bigger than what it was before, replace it
+			if numberOfColor <= ColorMap[color] {
+				// do nothing and continue
+				continue
+			}
+			// In every other cases, replace it
+			ColorMap[color] = numberOfColor
 		}
 	}
-
+	number := []int{2}
+	return number
 }
 func main() {
 	file, fileErr := os.ReadFile("../../input.txt")
@@ -76,5 +86,7 @@ func main() {
 		gameSets := game[1]
 
 		fmt.Println("gamesets:", gameSets)
+		number := findLargestReturnPower(gameSets)
+		fmt.Println("number:", number)
 	}
 }
