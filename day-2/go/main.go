@@ -64,14 +64,17 @@ func main() {
 
 	var allGameID []int
 	for _, line := range lines {
+		
 
 		game := strings.Split(line, ":")
+		fmt.Println("games", game)
 
-		if len(game) <= 2 {
+		if len(game) != 2 {
+			fmt.Println("length of game", len(game))
 			continue 
 		}
 
-		fmt.Println("games", game)
+		
 		gameName := game[0]
 
 		fmt.Println("Game name:", gameName)
