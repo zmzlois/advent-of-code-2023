@@ -16,7 +16,6 @@ var Requirement = map[string]int{
 
 func formatAndCheckingValidSet(set string) bool {
 
-	fmt.Println("Set looks like", set)
 	// At this point the cube will be 1 red, 1 blue, 4 green
 	cubes := strings.Split(set, ",")
 	cubeMap := make(map[string]int, len(cubes))
@@ -26,9 +25,7 @@ func formatAndCheckingValidSet(set string) bool {
 		trimmedCubeColor := strings.TrimSpace(cubeColor)
 		parts := strings.Split(trimmedCubeColor, " ")
 		if len(parts) != 2 {
-			fmt.Println("Invalid parts format: ", parts)
-			fmt.Println("Length of parts", len(parts))
-
+			// if the parts are not 2 parts we don't care about it and continue
 			continue
 		}
 		color := parts[1]
@@ -48,7 +45,6 @@ func formatAndCheckingValidSet(set string) bool {
 			cubeMap[color] = updatedNumber
 
 		}
-		fmt.Printf("cubMap: %d %v", cubeMap[color], color)
 		if cubeMap[color] > Requirement[color] {
 			return false
 		}
@@ -60,11 +56,19 @@ func formatAndCheckingValidSet(set string) bool {
 
 func CheckSetOk(boolSet []bool) bool {
 	for _, bools := range boolSet {
-		if bools == false {
+		if !bools {
 			return false
 		}
 	}
 	return true
+}
+
+func calculate(IDs []int) int {
+	number := 0
+	for _, id := range IDs {
+		number += id
+	}
+	return number
 }
 
 func main() {
@@ -75,7 +79,7 @@ func main() {
 	myFile := string(file[:])
 	lines := strings.Split(myFile, "\n")
 
-	// var allGameID []int
+	var allGameID []int
 	for _, line := range lines {
 
 		game := strings.Split(line, ":")
@@ -103,20 +107,26 @@ func main() {
 
 		gameSet := strings.Split(gameSets, ";")
 
+		var okSlices []bool
 		for _, sets := range gameSet {
 			// declare a slice to store ok
-			var okSlices []bool
 			// convert sets' rune value to string
 			setString := string(sets)
 
 			ok := formatAndCheckingValidSet(setString)
 			okSlices = append(okSlices, ok)
 			fmt.Println("ok", ok)
-			fmt.Println("okSlice", okSlices)
 
 		}
+		okSet := CheckSetOk(okSlices)
+		if !okSet {
+			continue
+		}
 
+		allGameID = append(allGameID, gameId)
 	}
-	// fmt.Println("Game ID Set", allGameID)
 
+	result := calculate(allGameID)
+
+	fmt.Println("result", result)
 }
