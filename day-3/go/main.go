@@ -16,8 +16,7 @@ type NumberPosition struct {
 	number    int
 }
 
-var symbols = []string{"*", "/", "-", "&", "$", "=", "+", "@", "#", "%"}
-
+// For part 1
 // * and & are helpers in Golang to get the memory position(pointers) of that data
 func findNumbers(input string, lineIndex int) []*NumberPosition {
 	// match anything that looks like a sequence of numbers, from 20 to 3259
@@ -74,6 +73,11 @@ func thereIsSymbol(numb *NumberPosition, lines []string) bool {
 	return false
 }
 
+// Part 2
+func findSymbol(lines string) [][]int {
+	res := regexp.MustCompile(`\*`)
+
+}
 func main() {
 	file, _ := os.Open("../input.txt")
 
