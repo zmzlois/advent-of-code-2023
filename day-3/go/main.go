@@ -1,78 +1,109 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
+type NumberPosition struct {
+	startPos  int
+	endPos    int
+	lineIndex int
+	number    int
+}
+
 var symbols = []string{"*", "/", "-", "&", "$", "=", "+", "@", "#", "%"}
-var numbers = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
 
-var symbolIndex = make(map[int][]int)
+// * and & are helpers in Golang to get the memory position(pointers) of that data
+func findNumbers(input string, lineIndex int) []*NumberPosition {
+	// match anything that looks like a sequence of numbers, from 20 to 3259
+	expression := regexp.MustCompile(`\d+`)
 
-// for a digit array looks like [2, 3, 4] and they should be joined together as a single digit
-func convertDigit(digitString []string) int {
-	var digitArray []int
-	result := 0
-	for _, digit := range digitString {
-		if len(digit) <= 1 {
+	// Find all string matches the index and return [][]int convert them to integer at the end
+	matches := expression.FindAllStringSubmatchIndex(input, -1)
+
+	// Extract numbers with their start and end position and put them into the result
+	//
+	result := make([]*NumberPosition, len(matches))
+
+	for i, match := range matches {
+		start := match[0]
+		end := match[1]
+		number, _ := strconv.Atoi(input[start:end])
+
+		result[i] = &NumberPosition{
+			number:    number,
+			startPos:  start,
+			lineIndex: lineIndex,
+			endPos:    end,
+		}
+	}
+	return result
+
+}
+
+func thereIsSymbol(numb *NumberPosition, lines []string) bool {
+	from := numb.startPos - 1
+
+	if from < 0 {
+		from = 0
+	}
+
+	to := numb.endPos + 1
+	if to > len(lines[0]) {
+		to = len(lines[0])
+	} // assume all lines have same length
+
+	// loop three lines
+	for loop := numb.lineIndex - 1; loop <= numb.lineIndex+1; loop++ {
+		// if it is the first line we skip
+		if loop < 0 || loop >= len(lines) {
 			continue
 		}
-		digitConvert, digitErr := strconv.Atoi(digit)
-		if digitErr != nil {
-			fmt.Println("error converting digit")
-		}
-		digitArray = append(digitArray, digitConvert)
-	}
-	// for every number in this updated digit array, make sure they become a real, single number
-	for _, digit := range digitArray {
-		result = result*10 + digit
-	}
-	fmt.Println("convertedDigit:", result)
-	return result
-}
 
-// for every position of the symbol, unless it is first line, check the line above
-// here we want to get an array of strings looks like [432 573 418 318]
-func checkLineAbove(HashMap [][]string, symbolIndex map[int][]int, i int, j int) []string {
-
-	var result []string
-	return result
-}
-
-// Make symbol position index
-func GetSymbolIndex(HashMap [][]string, i int, j int, char string) map[int][]int {
-	// var lineIndex []int
-
-	for _, symbol := range symbols {
-		if char == symbol {
-			symbolIndex[i] = append(symbolIndex[i], j)
+		// inspect line characters
+		findSymbol := strings.IndexAny(lines[loop][from:to], "+#@*=/-%&$")
+		if findSymbol > -1 {
+			return true
 		}
 	}
-	return symbolIndex
+	return false
 }
+
 func main() {
-	file, _ := os.ReadFile("../input.txt")
-	outputFile := string(file[:])
+	file, _ := os.Open("../input.txt")
 
-	lines := strings.Split(outputFile, "\n")
-	HashMap := make([][]string, len(lines))
-	// numbStore := make([]int, 0)
-	for i, line := range lines {
-		// store them in a hashMap first
-		HashMap[i] = strings.Split(line, "")
+	fileScan := bufio.NewScanner(file)
 
-		chars := strings.Split(line, "")
+	fileScan.Split(bufio.ScanLines)
 
-		for j, char := range chars {
-			// loop through the symbols and store the position in HashMap
-			symbolIndex = GetSymbolIndex(HashMap, i, j, char)
+	var fileLines []string
 
+	for fileScan.Scan() {
+		fileLines = append(fileLines, fileScan.Text())
+	}
+	file.Close()
+
+	lines := fileLines
+
+	var allNumbers []*NumberPosition
+	for lineIndex, line := range lines {
+
+		numbersForLines := findNumbers(line, lineIndex)
+
+		// getting all the numbers in here
+		allNumbers = append(allNumbers, numbersForLines...)
+	}
+	sum := 0
+	for _, numb := range allNumbers {
+		if thereIsSymbol(numb, lines) {
+			sum += numb.number
 		}
 	}
-	// fmt.Println("symbolIndex:", symbolIndex)
-	// fmt.Println("Hashmap?", HashMap)
+	fmt.Println("Total:", sum)
 
 }
