@@ -74,9 +74,50 @@ func thereIsSymbol(numb *NumberPosition, lines []string) bool {
 }
 
 // Part 2
-func findSymbol(lines string) [][]int {
-	res := regexp.MustCompile(`\*`)
+type SymbolPosition struct {
+	startPos  int
+	endPos    int
+	lineIndex int
+}
 
+func findSymbolPosition(line string, star rune) []int {
+	positions := []int{}
+
+	for i, char := range line {
+		if char == star {
+			positions = append(positions, i)
+		}
+	}
+	return positions
+}
+
+func numberAroundSymbol(numb *NumberPosition, lineIndex, startPos, numberOfLine int) bool {
+	// loop three lines
+	for loop := lineIndex - 1; loop <= lineIndex+1; loop++ {
+		// if it is not within this number's index is outside of these three line we don't care and continue
+		if numb.lineIndex != loop {
+			continue
+		}
+		// if it is before the first line and beyond current star position we don't care and continue
+		if loop < 0 || loop > numberOfLine {
+			continue
+		}
+
+		// check if this number is around the star
+		if numb.startPos == startPos || numb.startPos == startPos+1 {
+			return true // start position of the number seemed fine
+		}
+		if numb.endPos == startPos || numb.endPos-1 == startPos {
+			return true
+		}
+
+		if numb.lineIndex != lineIndex {
+			if numb.startPos <= startPos && numb.endPos >= startPos {
+				return true
+			}
+		}
+	}
+	return false
 }
 func main() {
 	file, _ := os.Open("../input.txt")
@@ -99,7 +140,6 @@ func main() {
 
 		numbersForLines := findNumbers(line, lineIndex)
 
-		// getting all the numbers in here
 		allNumbers = append(allNumbers, numbersForLines...)
 	}
 	sum := 0
@@ -108,6 +148,23 @@ func main() {
 			sum += numb.number
 		}
 	}
+	numberStarSum := 0
 	fmt.Println("Total:", sum)
+	for lineIndexOfStar, line := range lines {
+		starPosition := findSymbolPosition(line, '*')
+		for _, starPos := range starPosition {
+			var foundNumbers []*NumberPosition
+			for _, number := range allNumbers {
+				if numberAroundSymbol(number, lineIndexOfStar, starPos, len(lines)) {
+					foundNumbers = append(foundNumbers, number)
+				}
+			}
+
+			if len(foundNumbers) == 2 {
+				numberStarSum += foundNumbers[0].number * foundNumbers[1].number
+			}
+		}
+	}
+	fmt.Printf("Number Star Sum: %d\n", numberStarSum)
 
 }
