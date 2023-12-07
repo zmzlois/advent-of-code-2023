@@ -77,8 +77,8 @@ func sum(input []int) int {
 }
 
 // Task two
-func TaskTwoMatch(lines []string) map[int]*CardPoints {
-	cardPoints := make(map[int]*CardPoints, len(lines))
+func TaskTwoMatch(lines []string) map[int]CardPoints {
+	cardPoints := make(map[int]CardPoints, len(lines))
 
 	// var points []int
 	res := regexp.MustCompile(`\d+`)
@@ -109,9 +109,9 @@ func TaskTwoMatch(lines []string) map[int]*CardPoints {
 
 			}
 		}
-		cardIndex := lineIndex + 1
 
-		cardPoints[lineIndex] = &CardPoints{
+		cardIndex := lineIndex + 1
+		cardPoints[cardIndex] = CardPoints{
 			index:  cardIndex,
 			points: wonPoint,
 			// just set one copy for now and reloop them later
@@ -119,30 +119,32 @@ func TaskTwoMatch(lines []string) map[int]*CardPoints {
 		}
 
 	}
-	fmt.Println("length of cardPoints:", len(cardPoints))
 
-	for _, card := range cardPoints {
+	// it's correct until below
+	for cardIndex, card := range cardPoints {
 		fmt.Println("uncalculated card index:", card.index, "points:", card.points, "copy:", card.copy)
 		if card.points == 0 {
+			fmt.Println("card", card.index, "at position", cardIndex, "doesn't have a point so we skip")
 			// if the card wins zero point, we don't do anything about the rest of the cards
 			continue
 		}
 		for n := 1; n <= card.points; n++ {
 			// cardCopy := card.copy
 			// cardCopy += 1
-			cardPoints[card.index+n] = &CardPoints{
+			cardPoints[card.index+n] = CardPoints{
 				copy: cardPoints[card.index+n].copy + 1,
 			}
 			continue
 		}
 
 		fmt.Println("calculated card index:", card.index, "points:", card.points, "copy:", card.copy)
+		continue
 	}
 
 	return cardPoints
 }
 
-func calculateCopy(cardPoints map[int]*CardPoints) []int {
+func calculateCopy(cardPoints map[int]CardPoints) []int {
 	var allCopy []int
 	for _, card := range cardPoints {
 		allCopy = append(allCopy, card.copy)
