@@ -111,9 +111,12 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 		}
 
 		cardIndex := lineIndex + 1
+		finalPoint := wonPoint
+		// This is correct here
+		// fmt.Println("CardIndex:", cardIndex, "points:", wonPoint)
 		cardPoints[cardIndex] = CardPoints{
-			index:  cardIndex,
-			points: wonPoint,
+			// index:  cardIndex,
+			points: finalPoint,
 			// just set one copy for now and reloop them later
 			copy: 1,
 		}
@@ -121,27 +124,33 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 	}
 
 	// it's correct until below
+
+	return cardPoints
+}
+
+func turnPointsIntoCopy(cardPoints map[int]CardPoints) []int {
+	var points []int
 	for cardIndex, card := range cardPoints {
-		fmt.Println("uncalculated card index:", card.index, "points:", card.points, "copy:", card.copy)
+		fmt.Println("uncalculated card index:", cardIndex, "points:", card.points, "copy:", card.copy)
 		if card.points == 0 {
-			fmt.Println("card", card.index, "at position", cardIndex, "doesn't have a point so we skip")
+			// fmt.Println("card at position", cardIndex, "doesn't have a point so we skip")
 			// if the card wins zero point, we don't do anything about the rest of the cards
 			continue
 		}
-		for n := 1; n <= card.points; n++ {
-			// cardCopy := card.copy
-			// cardCopy += 1
-			cardPoints[card.index+n] = CardPoints{
-				copy: cardPoints[card.index+n].copy + 1,
+		if card.points >= 1 {
+			for n := 0; n <= card.points+1; n++ {
+				cardCopy := cardPoints[cardIndex+n].copy + 1
+				// cardCopy += 1
+				cardPoints[cardIndex+n] = CardPoints{
+					copy: cardCopy,
+				}
 			}
-			continue
 		}
 
-		fmt.Println("calculated card index:", card.index, "points:", card.points, "copy:", card.copy)
-		continue
+		fmt.Println("calculated card index:", cardIndex, "points:", card.points, "copy:", card.copy)
+		// continue
 	}
-
-	return cardPoints
+	return points
 }
 
 func calculateCopy(cardPoints map[int]CardPoints) []int {
@@ -172,6 +181,7 @@ func main() {
 
 	taskTwoMid := TaskTwoMatch(lines)
 	calTaskTwo := calculateCopy(taskTwoMid)
+	copyCount := turnPointsIntoCopy(calTaskTwo)
 	taskTwoResult := sum(calTaskTwo)
 	fmt.Println("Task Two Result:", taskTwoResult)
 }
