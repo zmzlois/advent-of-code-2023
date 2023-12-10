@@ -129,33 +129,20 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 	return cardPoints
 }
 
-func turnPointsIntoCopy(cardPoints map[int]CardPoints) []int {
-	var points []int
+func turnPointsIntoCopy(cardPoints map[int]CardPoints) map[int]int {
+	points := make(map[int]int, len(cardPoints))
 	for cardIndex, card := range cardPoints {
-		fmt.Println("uncalculated card index:", cardIndex, "points:", card.points, "copy:", card.copy)
-		if card.points > 0 {
-			// fmt.Println("card at position", cardIndex, "doesn't have a point so we skip")
-			for n := 0; n <= card.points; n++ {
-				cardCopy := cardPoints[cardIndex+n].copy + 1
-				// cardCopy += 1
-				cardPoints[cardIndex+n] = CardPoints{
-					points: card.points,
-					copy:   cardCopy,
-				}
-			}
-
-			// if the card wins zero point, we don't do anything about the rest of the cards
+		points[cardIndex] = card.copy
+		for n := cardIndex + 1; n <= len(cardPoints)-1; n++ {
+			points[n] += card.points
 		}
 	}
-	fmt.Println("CardPoints:", cardPoints)
+	fmt.Println("CardPoints:", cardPoints, "points:", points)
 
-	for _, card := range cardPoints {
-		points = append(points, card.copy)
-	}
 	return points
 }
 
-func calculateCopy(copies []int) int {
+func calculateCopy(copies map[int]int) int {
 	count := 0
 	for _, copy := range copies {
 		count = count + copy
