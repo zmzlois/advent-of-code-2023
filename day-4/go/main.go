@@ -123,6 +123,7 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 
 	}
 
+	fmt.Println("cardPoints", cardPoints)
 	// it's correct until below
 
 	return cardPoints
@@ -132,35 +133,35 @@ func turnPointsIntoCopy(cardPoints map[int]CardPoints) []int {
 	var points []int
 	for cardIndex, card := range cardPoints {
 		fmt.Println("uncalculated card index:", cardIndex, "points:", card.points, "copy:", card.copy)
-		if card.points == 0 {
+		if card.points > 0 {
 			// fmt.Println("card at position", cardIndex, "doesn't have a point so we skip")
-			// if the card wins zero point, we don't do anything about the rest of the cards
-			continue
-		}
-		if card.points >= 1 {
-			for n := 0; n <= card.points+1; n++ {
+			for n := 0; n <= card.points; n++ {
 				cardCopy := cardPoints[cardIndex+n].copy + 1
 				// cardCopy += 1
 				cardPoints[cardIndex+n] = CardPoints{
-					copy: cardCopy,
+					points: card.points,
+					copy:   cardCopy,
 				}
 			}
-		}
 
-		fmt.Println("calculated card index:", cardIndex, "points:", card.points, "copy:", card.copy)
-		// continue
+			// if the card wins zero point, we don't do anything about the rest of the cards
+		}
+	}
+	fmt.Println("CardPoints:", cardPoints)
+
+	for _, card := range cardPoints {
+		points = append(points, card.copy)
 	}
 	return points
 }
 
-func calculateCopy(cardPoints map[int]CardPoints) []int {
-	var allCopy []int
-	for _, card := range cardPoints {
-		allCopy = append(allCopy, card.copy)
+func calculateCopy(copies []int) int {
+	count := 0
+	for _, copy := range copies {
+		count = count + copy
 	}
-	fmt.Println("All copy:", allCopy)
 
-	return allCopy
+	return count
 }
 
 func main() {
@@ -180,8 +181,7 @@ func main() {
 	fmt.Println("TaskOneResult:", taskOneResult)
 
 	taskTwoMid := TaskTwoMatch(lines)
-	calTaskTwo := calculateCopy(taskTwoMid)
-	copyCount := turnPointsIntoCopy(calTaskTwo)
-	taskTwoResult := sum(calTaskTwo)
-	fmt.Println("Task Two Result:", taskTwoResult)
+	calTaskTwo := turnPointsIntoCopy(taskTwoMid)
+	copyCount := calculateCopy(calTaskTwo)
+	fmt.Println("Task Two Result:", copyCount)
 }
