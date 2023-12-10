@@ -123,9 +123,6 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 
 	}
 
-	fmt.Println("cardPoints", cardPoints)
-	// it's correct until below
-
 	return cardPoints
 }
 
@@ -133,11 +130,16 @@ func turnPointsIntoCopy(cardPoints map[int]CardPoints) map[int]int {
 	points := make(map[int]int, len(cardPoints))
 	for cardIndex, card := range cardPoints {
 		points[cardIndex] = card.copy
-		for n := cardIndex + 1; n <= len(cardPoints)-1; n++ {
-			points[n] += card.points
+		for n := 1; n <= len(cardPoints); n++ {
+			j := 0
+			j++
+			points[n] += j
+
+			fmt.Println("n:", n, "points-n", points[n])
+
 		}
 	}
-	fmt.Println("CardPoints:", cardPoints, "points:", points)
+	fmt.Println("points:", points)
 
 	return points
 }
