@@ -112,13 +112,9 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 
 		cardIndex := lineIndex + 1
 		finalPoint := wonPoint
-		// This is correct here
-		// fmt.Println("CardIndex:", cardIndex, "points:", wonPoint)
 		cardPoints[cardIndex] = CardPoints{
-			// index:  cardIndex,
 			points: finalPoint,
-			// just set one copy for now and reloop them later
-			copy: 1,
+			copy:   1,
 		}
 
 	}
@@ -127,27 +123,35 @@ func TaskTwoMatch(lines []string) map[int]CardPoints {
 }
 
 func turnPointsIntoCopy(cardPoints map[int]CardPoints) map[int]int {
-	points := make(map[int]int, len(cardPoints))
-	for cardIndex, card := range cardPoints {
-		points[cardIndex] = card.copy
-		for n := 1; n <= len(cardPoints); n++ {
-			j := 0
-			j++
-			points[n] += j
+	copies := make(map[int]int, len(cardPoints))
+	fmt.Println("Cardpoints", cardPoints)
 
-			fmt.Println("n:", n, "points-n", points[n])
+	// for each points gained from the cards, calculate the copy of the rest of them
+	for idx, card := range cardPoints {
+		countEnd := idx + card.points
 
+		if countEnd >= len(cardPoints) {
+			countEnd = len(cardPoints)
 		}
+		for n := idx + 1; n <= countEnd; n++ {
+			cardPoints[n] = CardPoints{
+				copy:   cardPoints[n].copy + cardPoints[idx].copy,
+				points: cardPoints[n].points,
+			}
+		}
+		copies[idx] = cardPoints[idx].copy
 	}
-	fmt.Println("points:", points)
+	// we have updated the copies from the first round, and now multiply and copies and points to apply them to the rest
 
-	return points
+	fmt.Println("Calculated cardPoints:", cardPoints)
+
+	return copies
 }
 
 func calculateCopy(copies map[int]int) int {
 	count := 0
-	for _, copy := range copies {
-		count = count + copy
+	for idx := range copies {
+		count += copies[idx]
 	}
 
 	return count
